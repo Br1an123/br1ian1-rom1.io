@@ -13,22 +13,20 @@
             align-items: center;
             height: 100vh;
         }
-
         #password-page,
         #content-page,
-        #fake-password-page,
-        #deep-page {
+        #code-page,
+        #double-page,
+        #next-step {
             display: none;
             text-align: center;
             width: 100%;
         }
-
         .password-box {
             padding: 10px;
             font-size: 18px;
             width: 250px;
         }
-
         .image-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -36,7 +34,6 @@
             width: 70%;
             margin: 0 auto;
         }
-
         .image-grid img {
             width: 100%;
             cursor: pointer;
@@ -45,20 +42,18 @@
 </head>
 <body>
 
-    <!-- 1 страница -->
     <div id="password-page">
         <h2>Пароль</h2>
         <input id="password-input" type="password" class="password-box" />
         <br><br>
-        <button onclick="checkPassword()">Войти</button>
+        <button onclick="checkFirst()">Войти</button>
     </div>
 
-    <!-- 2 страница -->
     <div id="content-page">
         <h1>Конец</h1>
         <div class="image-grid">
             <img src="https://via.placeholder.com/300" />
-            <img src="https://via.placeholder.com/300" onclick="openFakePassword()" />
+            <img src="https://via.placeholder.com/300" onclick="openThird()" />
             <img src="https://via.placeholder.com/300" />
             <img src="https://via.placeholder.com/300" />
             <img src="https://via.placeholder.com/300" />
@@ -66,24 +61,31 @@
         </div>
     </div>
 
-    <!-- 3 страница -->
-    <div id="fake-password-page">
-        <h2>Пароль</h2>
-        <input id="fake-input" type="password" class="password-box" />
+    <div id="code-page">
+        <h2>Код доступа</h2>
+        <input id="deep-code" type="password" class="password-box" />
         <br><br>
-        <button onclick="wrongPassword()">Продолжить</button>
+        <button onclick="processThird()">Продолжить</button>
     </div>
 
-    <!-- 4 страница  -->
-    <div id="deep-page">
-        <h1>Доступ получен</h1>
-        <p>Критичная внутренняя информация.</p>
+    <div id="double-page">
+        <h2>Дополнительная проверка</h2>
+        <input id="key1" type="password" class="password-box" placeholder="Код 1" />
+        <br><br>
+        <input id="key2" type="password" class="password-box" placeholder="Код 2" />
+        <br><br>
+        <button onclick="processDouble()">Подтвердить</button>
+    </div>
+
+    <div id="next-step">
+        <h1>Доступ разрешён</h1>
+        <p>Продолжение внутренних данных.</p>
     </div>
 
     <script>
         document.getElementById("password-page").style.display = "block";
 
-        function checkPassword() {
+        function checkFirst() {
             const p = document.getElementById("password-input").value;
             if (p === "342") {
                 document.getElementById("password-page").style.display = "none";
@@ -91,39 +93,41 @@
             }
         }
 
-        function openFakePassword() {
+        function openThird() {
             document.getElementById("content-page").style.display = "none";
-            document.getElementById("fake-password-page").style.display = "block";
+            document.getElementById("code-page").style.display = "block";
         }
 
-        function wrongPassword() {
-            const f = document.getElementById("fake-input").value;
+        const _k = 42;
+        const _data = [104,88,27,75,68,24,31,24,31,28,65,88,75,89,68,69,97,79,83,29];
 
-            if (f === "9472") {
-                const token = btoa(f + "_lvl4");
-                const data = {
-                    stage: 4,
-                    access: true,
-                    key: token,
-                    redirect: "/internal/secure"
-                };
-                
-                handleDeep(data);
+        function _secret() {
+            return _data.map(n => String.fromCharCode(n ^ _k)).join("");
+        }
+
+        function processThird() {
+            const input = document.getElementById("deep-code").value;
+            if (input === _secret()) {
+                document.getElementById("code-page").style.display = "none";
+                document.getElementById("double-page").style.display = "block";
             } else {
-                alert("Неверный пароль");
+                alert("Неверный код");
             }
         }
 
-        function handleDeep(packet) {
-            const enc = JSON.stringify(packet)
-                .split("")
-                .map(c => c.charCodeAt(0).toString(36))
-                .join("");
-
-            let verify = enc + "_ok";
+        function processDouble() {
+            const k1 = document.getElementById("key1").value;
+            const k2 = document.getElementById("key2").value;
+            const payload = JSON.stringify({
+                a: k1,
+                b: k2,
+                step: 5,
+                session: btoa(k1 + k2)
+            });
+            let processed = payload.split("").map(n => n.charCodeAt(0).toString(36)).join("");
+            let verify = processed + "_validated";
         }
     </script>
 
 </body>
 </html>
-
