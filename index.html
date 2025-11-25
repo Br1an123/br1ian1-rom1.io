@@ -17,7 +17,8 @@
         #content-page,
         #code-page,
         #double-page,
-        #next-step {
+        #next-step,
+        #page6 {
             display: none;
             text-align: center;
             width: 100%;
@@ -37,6 +38,23 @@
         .image-grid img {
             width: 100%;
             cursor: pointer;
+        }
+        .box {
+            padding: 20px;
+            width: 420px;
+            margin: 0 auto;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            background: #fff;
+        }
+        #attempts-left {
+            margin: 8px 0;
+            color: #333;
+        }
+        #video {
+            margin-top: 16px;
+            font-weight: bold;
+            display: none;
         }
     </style>
 </head>
@@ -62,72 +80,156 @@
     </div>
 
     <div id="code-page">
-        <h2>Код доступа</h2>
-        <input id="deep-code" type="password" class="password-box" />
-        <br><br>
-        <button onclick="processThird()">Продолжить</button>
+        <div class="box">
+            <h2>Код доступа</h2>
+            <input id="deep-code" type="password" class="password-box" />
+            <br><br>
+            <button onclick="processThird()">Продолжить</button>
+        </div>
     </div>
 
     <div id="double-page">
-        <h2>Дополнительная проверка</h2>
-        <input id="key1" type="password" class="password-box" placeholder="Код 1" />
-        <br><br>
-        <input id="key2" type="password" class="password-box" placeholder="Код 2" />
-        <br><br>
-        <button onclick="processDouble()">Подтвердить</button>
+        <div class="box">
+            <h2>Уровень 4</h2>
+            <div id="attempts-left">Осталось попыток: 10</div>
+            <input id="kA" class="password-box" placeholder="Код 1">
+            <br><br>
+            <input id="kB" class="password-box" placeholder="Код 2">
+            <br><br>
+            <input id="kC" class="password-box" placeholder="Код 3">
+            <br><br>
+            <button onclick="checkTriple()">Подтвердить</button>
+        </div>
     </div>
 
     <div id="next-step">
-        <h1>Доступ разрешён</h1>
-        <p>Продолжение внутренних данных.</p>
+        <div class="box">
+            <h2>Уровень 5</h2>
+            <p>25, Брайн Мапс, тигра, Рома, два дерево</p>
+            <p><strong>что обшего.</strong></p>
+            <input id="p5_answer" class="password-box">
+            <br><br>
+            <button onclick="checkPage5()">Проверить</button>
+        </div>
     </div>
 
-    <script>
-        document.getElementById("password-page").style.display = "block";
+    <div id="page6">
+        <div class="box">
+            <h2>Уровень 6</h2>
+            <p>Нажмите кнопку:</p>
+            <button onclick="showVideo()">Показать</button>
+            <div id="video">*** Зашифрованное видео ***</div>
+        </div>
+    </div>
 
-        function checkFirst() {
-            const p = document.getElementById("password-input").value;
-            if (p === "342") {
-                document.getElementById("password-page").style.display = "none";
-                document.getElementById("content-page").style.display = "block";
-            }
-        }
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    // сначала показываем первую страницу
+    document.getElementById("password-page").style.display = "block";
+});
 
-        function openThird() {
-            document.getElementById("content-page").style.display = "none";
-            document.getElementById("code-page").style.display = "block";
-        }
+/* -------------------------
+   1-я страница
+------------------------- */
+function checkFirst() {
+    const p = document.getElementById("password-input").value;
+    if (p === "342") {
+        document.getElementById("password-page").style.display = "none";
+        document.getElementById("content-page").style.display = "block";
+    }
+}
 
-        const _k = 42;
-        const _data = [104,88,27,75,68,24,31,24,31,28,65,88,75,89,68,69,97,79,83,29];
+/* -------------------------
+   переход на 3-ю страницу
+------------------------- */
+function openThird() {
+    document.getElementById("content-page").style.display = "none";
+    document.getElementById("code-page").style.display = "block";
+}
 
-        function _secret() {
-            return _data.map(n => String.fromCharCode(n ^ _k)).join("");
-        }
+/* -------------------------
+   3-я страница
+------------------------- */
+const _k3 = 42;
+const _data3 = [104,88,27,75,68,24,31,24,31,28,65,88,75,89,68,69,97,79,83,29];
+// функция
+function _secret3(){
+    return _data3.map(n => String.fromCharCode(n ^ _k3)).join('');
+}
 
-        function processThird() {
-            const input = document.getElementById("deep-code").value;
-            if (input === _secret()) {
-                document.getElementById("code-page").style.display = "none";
-                document.getElementById("double-page").style.display = "block";
-            } else {
-                alert("Неверный код");
-            }
-        }
+function processThird() {
+    const input = (document.getElementById("deep-code").value || "").trim();
+    // сравниваем строго — trim убирает лишние пробелы
+    if (input === _secret3()) {
+        document.getElementById("code-page").style.display = "none";
+        document.getElementById("double-page").style.display = "block";
+    } else {
+        alert("Неверный код");
+    }
+}
 
-        function processDouble() {
-            const k1 = document.getElementById("key1").value;
-            const k2 = document.getElementById("key2").value;
-            const payload = JSON.stringify({
-                a: k1,
-                b: k2,
-                step: 5,
-                session: btoa(k1 + k2)
-            });
-            let processed = payload.split("").map(n => n.charCodeAt(0).toString(36)).join("");
-            let verify = processed + "_validated";
-        }
-    </script>
+/* -------------------------
+   4-я страница 
+------------------------- */
+let _attempts = 10;
+document.getElementById("attempts-left").innerText = "Осталось попыток: " + _attempts;
+
+// ключ - видео 
+const _k4 = 13;
+const _enc4 = [
+    [62,57,58],       // для ?
+    [58,62,56],       // для ?
+    [60,62,56,61]     // для ?
+];
+
+function _getP4(i){
+    return _enc4[i].map(n => String.fromCharCode(n ^ _k4)).join('');
+}
+
+function checkTriple(){
+    const a = (document.getElementById("kA").value || "").trim();
+    const b = (document.getElementById("kB").value || "").trim();
+    const c = (document.getElementById("kC").value || "").trim();
+
+    // видео 
+    const ok1 = _getP4(0);
+    const ok2 = _getP4(1);
+    const ok3 = _getP4(2);
+
+    if (a === ok1 && b === ok2 && c === ok3) {
+        document.getElementById("double-page").style.display = "none";
+        document.getElementById("next-step").style.display = "block";
+        return;
+    }
+
+    _attempts--;
+    if (_attempts <= 0) {
+        // блокируем 
+        document.body.innerHTML = "<h1 style='text-align:center; margin-top:40vh;'>Вы заблокированы</h1>";
+        return;
+    }
+
+    document.getElementById("attempts-left").innerText =
+        "Осталось попыток: " + _attempts;
+
+    alert("Неверно! Осталось попыток: " + _attempts);
+}
+
+/* -------------------------
+   5-я страница 
+------------------------- */
+function checkPage5(){
+    alert("Неверный ответ");
+}
+
+/* -------------------------
+   6-я страница — показывает видео
+------------------------- */
+function showVideo(){
+    // показываем видео
+    document.getElementById("video").style.display = "block";
+}
+</script>
 
 </body>
 </html>
