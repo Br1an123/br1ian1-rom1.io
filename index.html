@@ -47,6 +47,24 @@
             border-radius: 6px;
             background: #fff;
         }
+
+        /* секретная на 5 странице */
+        #secret-btn {
+            position: fixed;
+            right: 5px;
+            bottom: 5px;
+            width: 20px;
+            height: 20px;
+            opacity: 0.05;
+            background: #000;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        #secret-btn:hover {
+            opacity: 0.4;
+        }
+
         #attempts-left {
             margin: 8px 0;
             color: #333;
@@ -111,6 +129,9 @@
             <br><br>
             <button onclick="checkPage5()">Проверить</button>
         </div>
+
+        <!-- 👁 секретная -->
+        <div id="secret-btn" onclick="goSecret()"></div>
     </div>
 
     <div id="page6">
@@ -124,13 +145,12 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function(){
-    // сначала показываем первую страницу
     document.getElementById("password-page").style.display = "block";
 });
 
-/* -------------------------
-   1-я страница
-------------------------- */
+/* ==========================
+   1 страница
+========================== */
 function checkFirst() {
     const p = document.getElementById("password-input").value;
     if (p === "342") {
@@ -139,27 +159,26 @@ function checkFirst() {
     }
 }
 
-/* -------------------------
-   переход на 3-ю страницу
-------------------------- */
+/* ==========================
+   Переход на 3 страницу
+========================== */
 function openThird() {
     document.getElementById("content-page").style.display = "none";
     document.getElementById("code-page").style.display = "block";
 }
 
-/* -------------------------
-   3-я страница
-------------------------- */
+/* ==========================
+   3 страница пароль (скрытый)
+   Br1an25256krasnoKey7
+========================== */
 const _k3 = 42;
 const _data3 = [104,88,27,75,68,24,31,24,31,28,65,88,75,89,68,69,97,79,83,29];
-// функция
 function _secret3(){
     return _data3.map(n => String.fromCharCode(n ^ _k3)).join('');
 }
 
 function processThird() {
     const input = (document.getElementById("deep-code").value || "").trim();
-    // сравниваем строго — trim убирает лишние пробелы
     if (input === _secret3()) {
         document.getElementById("code-page").style.display = "none";
         document.getElementById("double-page").style.display = "block";
@@ -168,20 +187,19 @@ function processThird() {
     }
 }
 
-/* -------------------------
-   4-я страница 
-------------------------- */
+/* ==========================
+   4 страница – три кода
+   347, 735, 1350
+========================== */
 let _attempts = 10;
 document.getElementById("attempts-left").innerText = "Осталось попыток: " + _attempts;
 
-// ключ - видео 
 const _k4 = 13;
 const _enc4 = [
-    [62,57,58],       // для ?
-    [58,62,56],       // для ?
-    [60,62,56,61]     // для ?
+    [62,57,58],
+    [58,62,56],
+    [60,62,56,61]
 ];
-
 function _getP4(i){
     return _enc4[i].map(n => String.fromCharCode(n ^ _k4)).join('');
 }
@@ -191,12 +209,7 @@ function checkTriple(){
     const b = (document.getElementById("kB").value || "").trim();
     const c = (document.getElementById("kC").value || "").trim();
 
-    // видео 
-    const ok1 = _getP4(0);
-    const ok2 = _getP4(1);
-    const ok3 = _getP4(2);
-
-    if (a === ok1 && b === ok2 && c === ok3) {
+    if (a === _getP4(0) && b === _getP4(1) && c === _getP4(2)) {
         document.getElementById("double-page").style.display = "none";
         document.getElementById("next-step").style.display = "block";
         return;
@@ -204,29 +217,30 @@ function checkTriple(){
 
     _attempts--;
     if (_attempts <= 0) {
-        // блокируем 
         document.body.innerHTML = "<h1 style='text-align:center; margin-top:40vh;'>Вы заблокированы</h1>";
         return;
     }
 
-    document.getElementById("attempts-left").innerText =
-        "Осталось попыток: " + _attempts;
-
+    document.getElementById("attempts-left").innerText = "Осталось попыток: " + _attempts;
     alert("Неверно! Осталось попыток: " + _attempts);
 }
 
-/* -------------------------
-   5-я страница 
-------------------------- */
+/* ==========================
+   5 страница 
+========================== */
 function checkPage5(){
     alert("Неверный ответ");
 }
 
-/* -------------------------
-   6-я страница — показывает видео
-------------------------- */
+/*  */
+function goSecret(){
+    window.location.href = "https://br1an123.github.io/nEvvGmail1-enter1/";  
+}
+
+/* ==========================
+   Страница 6 — скрытая
+========================== */
 function showVideo(){
-    // показываем видео
     document.getElementById("video").style.display = "block";
 }
 </script>
